@@ -60,4 +60,4 @@ def draw_santa(ax, center_x, center_y, scale, color_hat, color_beard, color_skin
     ax.add_artist(pom_pom)
 
     # 7. Pas (Czarny Prostokąt) - zorder=7
-    ax.fill([center_x - W_COAT/2 - 0.1, center_x + W_COAT/2 + 0.1, center_x + W_COAT/2 + 0.1, center_x - W_COAT/2 - 0.1
+    ax.fill([center_x - W_COAT/2 - 0.1, center_x + W_COAT/2 + 0.1, center_x + W_COAT/2 + 0.1, center_x - W_COAT/2 - 0.1]
