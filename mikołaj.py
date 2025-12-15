@@ -1,73 +1,63 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+import numpy as np
 import io
 
-def draw_santa_matplotlib_full_costume():
+# --- 1. FUNKCJA RYSOWANIA MIKOŁAJA (Z kształtów) ---
+
+def draw_santa(ax, center_x, center_y, scale, color_hat, color_beard, color_skin, color_coat):
     """
-    Rysuje obraz Mikołaja z pełnym kostiumem (kurtka, pas, broda) 
-    za pomocą Matplotlib.
+    Rysuje Mikołaja jako zbiór kształtów Matplotlib.
+    :param ax: Obiekt Axes Matplotlib do rysowania.
+    :param center_x, center_y: Centralna pozycja Mikołaja.
+    :param scale: Współczynnik skalowania.
+    :param color_*: Kolory elementów.
     """
     
-    # 1. Konfiguracja płótna
-    # Zwiększamy rozmiar Y, aby zmieścić cały tułów
-    fig, ax = plt.subplots(figsize=(4, 6)) 
-    
-    # Ustawienia tła i osi
-    ax.set_facecolor('#B0E0E6')  # Jasnoniebieskie tło
-    ax.set_xlim(-1.5, 1.5)
-    ax.set_ylim(-2.0, 1.5)  # Większy zakres Y
-    ax.set_aspect('equal')
-    ax.axis('off')
-    
-    # --- Kolory ---
-    RED = '#D93025'
-    WHITE = '#FFFFFF'
-    SKIN = '#F2C8AD'
+    # --- Wymiary i Kolory ---
+    RED = color_hat
+    WHITE = color_beard
+    SKIN = color_skin
+    COAT = color_coat
     BLACK = '#000000'
     GOLD = '#FFD700'
+
+    # Wymiary skalowane
+    R_FACE = 0.4 * scale
+    R_POMPOM = 0.1 * scale
+    H_HAT = 1.0 * scale
+    W_COAT = 1.0 * scale
+    H_COAT = 1.2 * scale
     
-    # --- Rysowanie Elementów ---
+    # --- Rysowanie Elementów (Zorder zapewnia poprawne warstwy) ---
     
-    # 2. Kurtka (Główny Korpus, Czerwony Prostokąt)
-    # Rysujemy poniżej linii talii (y=0.0)
-    ax.fill([-1.0, 1.0, 1.0, -1.0], [0.0, 0.0, -2.0, -2.0], color=RED, zorder=1) 
-    
-    # 3. Pas (Czarny Prostokąt)
-    ax.fill([-1.2, 1.2, 0.4, 0.4], [0.1, 0.1, -0.3, -0.3], color=BLACK, zorder=2) # Czarny pasek
-    
-    # Klamra Paska (Złoty/Żółty Kwadrat)
-    ax.fill([-0.25, 0.25, 0.25, -0.25], [0.0, 0.0, -0.2, -0.2], color=GOLD, zorder=3)
-    
-    # 4. Brody (Duży biały kształt, który zachodzi na kurtkę i twarz)
-    # Biała broda (duże koło/owal, który maskuje część kurtki)
-    beard_oval = plt.Circle((0, -0.2), 0.9, color=WHITE, zorder=4)
-    ax.add_artist(beard_oval)
-    
-    # 5. Twarz (Koło)
-    face = plt.Circle((0, 0.3), 0.4, color=SKIN, zorder=5)
+    # 1. Tułów (Płaszcz) - zorder=1
+    ax.fill([center_x - W_COAT/2, center_x + W_COAT/2, center_x + W_COAT/2, center_x - W_COAT/2],
+            [center_y - H_COAT, center_y - H_COAT, center_y, center_y],
+            color=COAT, zorder=1)
+
+    # 2. Broda (Duży Biały Owal/Kształt) - zorder=2
+    # Używamy elipsy dla lepszego kształtu brody
+    beard = plt.Circle((center_x, center_y - R_FACE/2), R_FACE * 1.5, color=WHITE, zorder=2)
+    ax.add_artist(beard)
+
+    # 3. Twarz (Koło) - zorder=3
+    face = plt.Circle((center_x, center_y + R_FACE), R_FACE, color=SKIN, zorder=3)
     ax.add_artist(face)
-    
-    # 6. Kapelusz
-    # Czerwony Kapelusz (Trójkąt)
-    hat_x = [-0.6, 0.6, 0]
-    hat_y = [0.65, 0.65, 1.4]
-    ax.fill(hat_x, hat_y, color=RED, zorder=6)
-    
-    # Biały Brzeg Kapelusza (Prostokąt)
-    ax.fill([-0.7, 0.7, 0.7, -0.7], [0.55, 0.55, 0.75, 0.75], color=WHITE, zorder=7)
-    
-    # Pompon (Małe koło)
-    pom_pom = plt.Circle((0, 1.4), 0.1, color=WHITE, edgecolor=BLACK, linewidth=0.5, zorder=8)
+
+    # 4. Kapelusz (Trójkąt) - zorder=4
+    ax.fill([center_x - R_FACE, center_x + R_FACE, center_x],
+            [center_y + R_FACE*2, center_y + R_FACE*2, center_y + R_FACE*2 + H_HAT],
+            color=RED, zorder=4)
+
+    # 5. Biały Brzeg Kapelusza (Pasek) - zorder=5
+    ax.fill([center_x - R_FACE*1.1, center_x + R_FACE*1.1, center_x + R_FACE*1.1, center_x - R_FACE*1.1],
+            [center_y + R_FACE*1.8, center_y + R_FACE*1.8, center_y + R_FACE*2.2, center_y + R_FACE*2.2],
+            color=WHITE, zorder=5)
+
+    # 6. Pompon (Małe Koło) - zorder=6
+    pom_pom = plt.Circle((center_x, center_y + R_FACE*2 + H_HAT), R_POMPOM, color=WHITE, edgecolor=BLACK, linewidth=0.5, zorder=6)
     ax.add_artist(pom_pom)
-    
-    # 7. Oczy i Nos
-    eye1 = plt.Circle((-0.15, 0.35), 0.05, color=BLACK, zorder=9)
-    eye2 = plt.Circle((0.15, 0.35), 0.05, color=BLACK, zorder=9)
-    ax.add_artist(eye1)
-    ax.add_artist(eye2)
-    
-    # Nos (małe koło na twarzy)
-    nose = plt.Circle((0, 0.2), 0.1, color=SKIN, zorder=10)
-    ax.add_artist(nose)
-    
-    # 8. Biała Krawędź Kurtki (Pionowy Biały Pasek)
+
+    # 7. Pas (Czarny Prostokąt) - zorder=7
+    ax.fill([center_x - W_COAT/2 - 0.1, center_x + W_COAT/2 + 0.1, center_x + W_COAT/2 + 0.1, center_x - W_COAT/2 - 0.1
