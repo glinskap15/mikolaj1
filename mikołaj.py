@@ -1,7 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-import numpy as np
 import io
+import numpy as np
 
 # --- 1. FUNKCJA RYSOWANIA MIKOŁAJA (Z kształtów) ---
 
@@ -9,9 +9,7 @@ def draw_santa(ax, center_x, center_y, scale, color_hat, color_beard, color_skin
     """
     Rysuje Mikołaja jako zbiór kształtów Matplotlib.
     :param ax: Obiekt Axes Matplotlib do rysowania.
-    :param center_x, center_y: Centralna pozycja Mikołaja.
-    :param scale: Współczynnik skalowania.
-    :param color_*: Kolory elementów.
+    # ... pozostałe parametry kolorów i pozycji
     """
     
     # --- Wymiary i Kolory ---
@@ -32,6 +30,7 @@ def draw_santa(ax, center_x, center_y, scale, color_hat, color_beard, color_skin
     # --- Rysowanie Elementów (Zorder zapewnia poprawne warstwy) ---
     
     # 1. Tułów (Płaszcz) - zorder=1
+    # POPRAWIONE NAWIASY W ax.fill
     ax.fill([center_x - W_COAT/2, center_x + W_COAT/2, center_x + W_COAT/2, center_x - W_COAT/2],
             [center_y - H_COAT, center_y - H_COAT, center_y, center_y],
             color=COAT, zorder=1)
@@ -46,11 +45,13 @@ def draw_santa(ax, center_x, center_y, scale, color_hat, color_beard, color_skin
     ax.add_artist(face)
 
     # 4. Kapelusz (Trójkąt) - zorder=4
+    # POPRAWIONE NAWIASY W ax.fill
     ax.fill([center_x - R_FACE, center_x + R_FACE, center_x],
             [center_y + R_FACE*2, center_y + R_FACE*2, center_y + R_FACE*2 + H_HAT],
             color=RED, zorder=4)
 
     # 5. Biały Brzeg Kapelusza (Pasek) - zorder=5
+    # POPRAWIONE NAWIASY W ax.fill
     ax.fill([center_x - R_FACE*1.1, center_x + R_FACE*1.1, center_x + R_FACE*1.1, center_x - R_FACE*1.1],
             [center_y + R_FACE*1.8, center_y + R_FACE*1.8, center_y + R_FACE*2.2, center_y + R_FACE*2.2],
             color=WHITE, zorder=5)
@@ -60,4 +61,12 @@ def draw_santa(ax, center_x, center_y, scale, color_hat, color_beard, color_skin
     ax.add_artist(pom_pom)
 
     # 7. Pas (Czarny Prostokąt) - zorder=7
-    ax.fill([center_x - W_COAT/2 - 0.1, center_x + W_COAT/2 + 0.1, center_x + W_COAT/2 + 0.1, center_x - W_COAT/2 - 0.1]
+    # POPRAWIONE NAWIASY W ax.fill
+    ax.fill([center_x - W_COAT/2 - 0.1, center_x + W_COAT/2 + 0.1, center_x + W_COAT/2 + 0.1, center_x - W_COAT/2 - 0.1],
+            [center_y - 0.1 * scale, center_y - 0.1 * scale, center_y + 0.1 * scale, center_y + 0.1 * scale],
+            color=BLACK, zorder=7)
+    
+    # 8. Klamra (Złoty/Żółty Kwadrat) - zorder=8
+    # POPRAWIONE NAWIASY W ax.fill
+    ax.fill([center_x - 0.15 * scale, center_x + 0.15 * scale, center_x + 0.15 * scale, center_x - 0.15 * scale],
+            [center_y - 0.05 * scale, center_y - 0.05 * scale, center_y +
